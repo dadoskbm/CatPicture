@@ -59,7 +59,9 @@ void CatPictureApp::setup()
 	drawRectangle(200, 210, 48, 92, new Color8u(0,0,0),new Color8u(255,0,0));
 	drawCircle(200, 300, 100, new Color8u(0,0,0), new Color8u(0, 0, 255));
 	drawTriangle(35, 135, 210, 411, 510, 500, new Color8u(0,0,0));
+	blur();
 }
+
 
 /**
 * Draws a circle.
@@ -73,9 +75,9 @@ void CatPictureApp::setup()
 void CatPictureApp::drawCircle(int xC, int yC, int r, Color8u* line, Color8u* fill)
 {
 	double dist;
-	for(int x = 1; x < WIDTH; x++)
+	for(int x = 0; x <= WIDTH; x++)
 	{
-		for(int y = 1; y < HEIGHT; y++)
+		for(int y = 0; y <= HEIGHT; y++)
 		{
 			//Calculate the distance from the center, if it equals (or is close to)
 			// the radius, the pixel becomes part of the circle.
@@ -98,6 +100,32 @@ void CatPictureApp::mouseDown( MouseEvent event )
 */
 void CatPictureApp::blur()
 {
+	uint8_t* newData = new uint8_t[WIDTH * HEIGHT * 3];
+	for(int x = 0; x < WIDTH; x++)
+	{
+		for(int y = 0; y < HEIGHT; y++)
+		{
+			uint8_t* kernel = new uint8_t[27];
+			int sumR = 0, sumG = 0, sumB = 0;
+			for(int j = y - 1; j <= y + 1; j++)
+			{
+				for(int i = x - 1; i <= x + 1; i++)
+				{
+					uint8_t* arr = get(i, j);
+					sumR += arr[0];
+					sumG += arr[1];
+					sumB += arr[2];
+				}
+			}
+			int index = 3 * (x + y * WIDTH);
+			newData[index] = math<double>().floor(sumR / 9.0);
+			newData[index + 1] = math<double>().floor(sumG / 9.0);
+			newData[index + 2] = math<double>().floor(sumB / 9.0);
+		}
+	}
+	for(int i = 0; i < WIDTH * HEIGHT * 3; i++)
+		dataArr[i] = newData[i];
+
 }
 
 void CatPictureApp::update()
