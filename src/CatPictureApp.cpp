@@ -6,6 +6,7 @@
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/ImageIo.h"
+#include <stdlib.h>
 
 
 #define WIDTH 800
@@ -27,6 +28,7 @@ class CatPictureApp : public AppBasic {
 	//void copy(int x, int y, int l, int w, int xF, int yF);
 	void drawTriangle(int x1, int y1, int x2, int y2,int x3,int y3, Color8u* line);
 	void blur();
+	//void prepareSettings(Settings* settings);
 
   private:
 	bool modify(Color8u* color, int x, int y);
@@ -51,15 +53,19 @@ void CatPictureApp::setup()
 	{
 		for(int y = 0; y < HEIGHT; y++)
 		{
-			modify(new Color8u(0,255,0),x,y);
+			modify(new Color8u(255,255,255),x,y);
 		}
 	}
+
 	
+
 	drawLine(0,0,800,600,new Color8u(0,0,0));
 	drawRectangle(200, 210, 48, 92, new Color8u(0,0,0),new Color8u(255,0,0));
 	drawCircle(200, 300, 100, new Color8u(0,0,0), new Color8u(0, 0, 255));
 	drawTriangle(35, 135, 210, 411, 510, 500, new Color8u(0,0,0));
 	blur();
+
+	writeImage("blah.png",*surface);
 }
 
 
@@ -75,9 +81,9 @@ void CatPictureApp::setup()
 void CatPictureApp::drawCircle(int xC, int yC, int r, Color8u* line, Color8u* fill)
 {
 	double dist;
-	for(int x = 0; x <= WIDTH; x++)
+	for(int x = 0; x < WIDTH; x++)
 	{
-		for(int y = 0; y <= HEIGHT; y++)
+		for(int y = 0; y < HEIGHT; y++)
 		{
 			//Calculate the distance from the center, if it equals (or is close to)
 			// the radius, the pixel becomes part of the circle.
@@ -91,8 +97,15 @@ void CatPictureApp::drawCircle(int xC, int yC, int r, Color8u* line, Color8u* fi
 			
 }
 
+/**
+* Every time the mouse is clicked, draw a circle with a random radius and colors in that position. Every time the right button is clicked, blur the image.
+*/
 void CatPictureApp::mouseDown( MouseEvent event )
 {
+	drawCircle(event.getX(),event.getY(),rand() % 50 + 5, new Color8u(rand() % 256, rand() % 256, rand() % 256), new Color8u(rand() % 256, rand() % 256, rand() % 256));
+	if(event.isRight())
+		blur();
+	writeImage("blah.png",*surface);
 }
 
 /**
@@ -111,6 +124,8 @@ void CatPictureApp::blur()
 			{
 				for(int i = x - 1; i <= x + 1; i++)
 				{
+					if(i < 0 || i >= WIDTH || j < 0 || j >= HEIGHT)
+						continue;
 					uint8_t* arr = get(i, j);
 					sumR += arr[0];
 					sumG += arr[1];
@@ -127,6 +142,12 @@ void CatPictureApp::blur()
 		dataArr[i] = newData[i];
 
 }
+
+//void CatPictureApp::prepareSettings(Settings* settings)
+//{
+//	settings->setWindowSize(width, height);
+//	settings->setResizable(false);
+//}
 
 void CatPictureApp::update()
 {
