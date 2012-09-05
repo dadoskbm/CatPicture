@@ -26,6 +26,7 @@ class CatPictureApp : public AppBasic {
 	void drawCircle(int xC, int yC, int r, Color8u* line, Color8u* fill);
 	//void copy(int x, int y, int l, int w, int xF, int yF);
 	void drawTriangle(int x1, int y1, int x2, int y2,int x3,int y3, Color8u* line);
+	void blur();
 
   private:
 	bool modify(Color8u* color, int x, int y);
@@ -89,6 +90,13 @@ void CatPictureApp::drawCircle(int xC, int yC, int r, Color8u* line, Color8u* fi
 }
 
 void CatPictureApp::mouseDown( MouseEvent event )
+{
+}
+
+/**
+* Blurs the image
+*/
+void CatPictureApp::blur()
 {
 }
 
