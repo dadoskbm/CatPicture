@@ -105,10 +105,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CatPictureApp.cpp" />
-    <ClCompile Include="..\src\ImageManipulator.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\ImageManipulator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
