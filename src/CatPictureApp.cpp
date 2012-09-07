@@ -1,6 +1,21 @@
 /**
 * Project by Brandon Dadosky for CSE 274 homework assignment 1.
 */
+/**
+* @file CatPicture.cpp
+* 
+* @author Brandon Dadosky
+* @date September 2012
+* 
+* @note This file is (c) 2012.  It is licensed under the
+* CC gv 3.0 license (http://creativecommons.org/licenses/by/3.0/),
+* which means you are free to use, share, and remix it as long as you
+* give attribution.  Commercial uses are allowed.
+* 
+* This project fulfills the following requirements for homework 1:
+* 
+* 
+*/
 
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
@@ -28,7 +43,7 @@ class CatPictureApp : public AppBasic {
 	//void copy(int x, int y, int l, int w, int xF, int yF);
 	void drawTriangle(int x1, int y1, int x2, int y2,int x3,int y3, Color8u* line);
 	void blur();
-	//void prepareSettings(Settings* settings);
+	void prepareSettings(Settings* settings);
 
   private:
 	bool modify(Color8u* color, int x, int y);
@@ -43,6 +58,8 @@ void CatPictureApp::setup()
 {
 	setWindowSize(WIDTH, HEIGHT);
 	surface = new Surface(WIDTH, HEIGHT, false);
+	// not sure what intMath is doing, might help other users to understand
+	// if you document this somehow in the comments
 	intMath = new math<int>();
 
 	dataArr = surface->getData();
@@ -64,19 +81,21 @@ void CatPictureApp::setup()
 	drawCircle(200, 300, 100, new Color8u(0,0,0), new Color8u(0, 0, 255));
 	drawTriangle(35, 135, 210, 411, 510, 500, new Color8u(0,0,0));
 	blur();
-
+	// Saves Image
 	writeImage("blah.png",*surface);
 }
 
 
 /**
+* @brief Draw Circle
+* 
 * Draws a circle.
-* Params:
-	xC = X-coordinate of the center of the circle
-	yC = Y-coordinate of the center of the circle
-	r = Radius of the circle
-	line = Color object containing color information for the outside line
-	fill = Color of the fill. If this value is 0, the circle won't be filled.
+* 
+* @param xC the X-coordinate of the center of the circle
+* @param yC the Y-coordinate of the center of the circle
+* @param r the radius of the circle
+* @param line the color object containing color information for the outside line
+* @param fill the color of the fill. If this value is 0, the circle won't be filled.
 */
 void CatPictureApp::drawCircle(int xC, int yC, int r, Color8u* line, Color8u* fill)
 {
@@ -98,18 +117,28 @@ void CatPictureApp::drawCircle(int xC, int yC, int r, Color8u* line, Color8u* fi
 }
 
 /**
-* Every time the mouse is clicked, draw a circle with a random radius and colors in that position. Every time the right button is clicked, blur the image.
+* @brief Mouse Click Circle
+* 
+* Every time the mouse is clicked, draw a circle with a random radius and colors 
+* in that position. Every time the right button is clicked, blur the image.
 */
 void CatPictureApp::mouseDown( MouseEvent event )
 {
-	drawCircle(event.getX(),event.getY(),rand() % 50 + 5, new Color8u(rand() % 256, rand() % 256, rand() % 256), new Color8u(rand() % 256, rand() % 256, rand() % 256));
+	drawCircle(event.getX(),event.getY(),rand() % 50 + 5, 
+		new Color8u(rand() % 256, rand() % 256, rand() % 256), 
+		new Color8u(rand() % 256, rand() % 256, rand() % 256));
 	if(event.isRight())
 		blur();
-	writeImage("blah.png",*surface);
+	// took out save here since you are already saving in the setup
+	// seems like it could cause issues to keep saving to the same file
+	// each time the user clicks
+	// writeImage("blah.png",*surface);
 }
 
 /**
-* Blurs the image
+* @brief Blur
+* 
+* Blurs the image using a kernel
 */
 void CatPictureApp::blur()
 {
@@ -143,44 +172,50 @@ void CatPictureApp::blur()
 
 }
 
-//void CatPictureApp::prepareSettings(Settings* settings)
-//{
-//	settings->setWindowSize(width, height);
-//	settings->setResizable(false);
-//}
+// Reactivated the prepSettings method so that now you could come back and change the
+// settings for the window if you wanted to.  Liked the idea for WIDTH and HEIGHT
+void CatPictureApp::prepareSettings(Settings* settings)
+{
+	settings->setWindowSize(WIDTH, HEIGHT);
+	settings->setResizable(false);
+}
 
 void CatPictureApp::update()
 {
 	dataArr = surface->getData();
 }
 /**
+* @brief Draw a line
+* 
 * Draws a straight line between the two points.
-* Params:
-	xI = Initial X
-	yI = Initial Y
-	xF = Final X
-	yF = Final Y
-	color = Color to draw.
+* 
+* @param x1 the x coordinate of the first point
+* @param y2 the y coordinate of the first point
+* @param x1 the x coordinate of the second point
+* @param y2 the y coordinate of the second point
+* @param color the Color to of the line
 */
-void CatPictureApp::drawLine(int xI, int yI, int xF, int yF, Color8u* color)
+void CatPictureApp::drawLine(int x1, int y1, int x2, int y2, Color8u* color)
+// changed the names of the parametets, thought x1 would make more sense
+// to the user than xF, fairly arbitrary though.. might just be personal preference
 {
 	//Implementation of Bresenham's line algorithm, derived from pseudocode
 	//from Wikipedia.
 
 	
-	int dx = intMath->abs(xF - xI);
-	int dy = intMath->abs(yF - yI);
+	int dx = intMath->abs(x2 - x1);
+	int dy = intMath->abs(y2 - y1);
 
-	int sx = intMath->signum(xF - xI);
-	int sy = intMath->signum(yF - yI);
+	int sx = intMath->signum(x2 - x1);
+	int sy = intMath->signum(y2 - y1);
 	int err = dx - dy;
-	int x = xI;
-	int y = yI;
+	int x = x1;
+	int y = y1;
 
 	while(true)
 	{
 		modify(color,x,y);
-		if(x == xF && y == yF)
+		if(x == x2 && y == y2)
 			break;
 		int e2 = 2 * err;
 		if(e2 > -dy)
@@ -197,16 +232,20 @@ void CatPictureApp::drawLine(int xI, int yI, int xF, int yF, Color8u* color)
 }
 
 /**
-* Retrieves an array of color values at a given pixel
-* Params:
-	x = X-coordinate to get pixel data from
-	y = Y-coordinate to get pixel data from
-* Returns:
-	A pointer to a uint8_t array containing, in order, the red, green, and
-	blue values for the pixel.
+* @brief Get Color Array
+* 
+* Retrieves an array of color values at a given pixel using row major order
+* based on the x and y coordinate of the pixel in the picture
+* 
+* @param x the X-coordinate to get pixel data from
+* @param y the Y-coordinate to get pixel data from
+* 
+* @return A pointer to a uint8_t array containing, in order, the red, green, and
+* blue values for the pixel.
 */
 uint8_t* CatPictureApp::get(int x, int y)
 {
+	// Calculate row major order
 	int start = 3 * (x + y * WIDTH);
 	uint8_t* arr = new uint8_t[3];
 	arr[0] = dataArr[start];
@@ -254,10 +293,19 @@ uint8_t* CatPictureApp::get(int x, int y)
 //}
 
 /**
-* Draws a triangle.
-* Params: 
-	x1, y1, x2, y2, x3, y3 = Points of the triangle
-	line = Color of the line
+* @brief Draw Triangle
+* 
+* Draws only the edges of a triangle based on the 
+* three points of each of the vertices
+* of the triangle as well as the color of the triangle
+*  
+* @param x1 the x coordinate of the first vertex
+* @param y1 the y coordinate of the first vertex
+* @param x2 the x coordinate of the second vertex
+* @param y2 the y coordinate of the second vertex
+* @param x3 the x coordinate of the third vertex
+* @param y3 the y coordinate of the third vertex
+* @param line the color of the edges of each of the triangle
 */
 void CatPictureApp::drawTriangle(int x1, int y1, int x2, int y2,int x3,int y3, Color8u* line)
 {
@@ -268,14 +316,16 @@ void CatPictureApp::drawTriangle(int x1, int y1, int x2, int y2,int x3,int y3, C
 }
 
 /**
+* @brief Draw Rectangle
+* 
 * Draws a rectangle from point (x1,y1) to point (x2,y2).
-* Params:
-	xA = X-coordinate to start at
-	yA = Y-coordinate to start at
-	xB = X-coordinate to end at
-	yB = Y-coordinate to end at
-	line = Color for the line
-	fill = Color for the fill. If this is 0, the rectangle will not be filled.
+* 
+* @param xA the X-coordinate of the first point
+* @param yA the Y-coordinate of the first point
+* @param xB the X-coordinate of the second point
+* @param yB the Y-coordinate of the secondpoint
+* @param line the color for the line
+* @param fill the color for the fill. If this is 0, the rectangle will not be filled.
 */
 
 void CatPictureApp::drawRectangle(int xA, int yA, int xB, int yB, Color8u* line, Color8u* fill)
@@ -332,15 +382,19 @@ void CatPictureApp::drawRectangle(int xA, int yA, int xB, int yB, Color8u* line,
 
 
 /**
-* Modifies a single pixel to a given color at a given coordinate on the image. This method serves mainly to
-* abstract the row-major order of the data array, provide one specific place to modify it, and perform bounds
+* @brief Modify Pixel
+* 
+* Modifies a single pixel to a given color at a given 
+* coordinate on the image. This method serves mainly to
+* abstract the row-major order of the data array, provide
+* one specific place to modify it, and perform bounds
 * checking
-* Params: 
-	color = A Color8u object that contains the desired color.
-	x = X-coordinate
-	y = Y-coordinate
-* Returns:
-	false if and only if the X or Y coordinates are out of bounds.
+* 
+* @param color the Color8u object that contains of the desired color.
+* @param x the X-coordinate
+* @param y the Y-coordinate
+* 
+* @returns false if and only if the X or Y coordinates are out of bounds.
 */
 bool CatPictureApp::modify(Color8u* color, int x, int y)
 {
