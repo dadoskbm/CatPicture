@@ -140,13 +140,14 @@ void CatPictureApp::mouseDown( MouseEvent event )
 * 
 * Blurs the image using a kernel
 */
-void CatPictureApp::blur()
+void CatPictureApp::blur() //TODO: Very slow.
 {
 	uint8_t* newData = new uint8_t[WIDTH * HEIGHT * 3];
 	for(int x = 0; x < WIDTH; x++)
 	{
 		for(int y = 0; y < HEIGHT; y++)
 		{
+			
 			uint8_t* kernel = new uint8_t[27];
 			int sumR = 0, sumG = 0, sumB = 0;
 			for(int j = y - 1; j <= y + 1; j++)
